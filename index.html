@@ -117,8 +117,15 @@ As a librarian i want to retrieve the list of books in the library" :disabled="s
           this.showLoading = false;
         },
         processResponseText(text) {
-          //remove text before the JSON start. OpenAI sometimes adds special characters or text
-          return text.substring(text.indexOf("{"));
+          //remove text before and after the JSON ojbect. OpenAI sometimes adds some characters or text
+          let firstBracketIndex = text.indexOf("{");
+          let lastBracketIndex = text.lastIndexOf("}");
+
+          if (lastBracketIndex != text.length) {
+            return text.slice(firstBracketIndex, lastBracketIndex+1);
+          } else {
+            return text.substring(firstBracketIndex);
+          }
         }
       }
     }).mount('#app')
