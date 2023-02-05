@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Companion</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.css"
+    integrity="sha512-3ZF6q2IwJ/o3zbm5kBJX1RtjPFxnFcTBH+pa/jtnvvhygsYFcEqX+T9guR01rI8gozi4fPU95W+SZES6ew28qA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+  <div class="container" id="app">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row-md"><h1 class="font-weight-bold text-primary rounded">API Companion</h1></div>
+        <div class="row-md"> <p class="text-muted">API Companion is a web application that leverages OpenAI artificial intelligence to streamline the API design process.</p></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+          <div class="row-md"> <textarea class="form-control" rows=10  v-model="story" placeholder="Your User Story f.e.
+As a librarian i want to retrieve the list of books in the library" :disabled="showLoading"></textarea></div>
+          <div class="row-md" style="margin-top:10px"><a class="btn btn-light" v-show="!showLoading" href="#" v-on:click="submit">SUBMIT</a>
+          <div class="row-md"><div id="loading" v-show="showLoading" class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div></div>
+        </div>
+      </div>
+      <div class="col-md-6" v-show="showResults">
+          <div class="row-md"><h5 class="text-primary">Swagger UI</h5><div class="swagger border border-light rounded" id="swagger"></div></div>
+          <div class="row-md"><h5 class="text-primary">OpenAPI Definition</h5><textarea class="form-control" rows=40  v-model="definition"></textarea>
+        </div>
+        </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@3.23.1/swagger-ui-bundle.js"></script>
+
+  <script>
+
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          apikey: "c2stRE9LNDRYaGRPcklxeEZCSkRIRHlUM0JsYmtGSnd0Q0pqb1lmWmEwVGJIUE1zZG9L",
+          story: "",
+          definition: "",
+          showLoading: false,
+          showResults: false
+        }
+      },
+      methods: {
+        submit() {
+          console.log("submitting " + this.story);
+          this.showLoading = true;
+          this.generateSpec(atob(this.apikey), this.story)
+            .then(response => response.json())
+            .catch(error => console.log('error', error))
+            .then(result => {
+              var definition = this.processResponseText(result.choices[0].text);
+              this.definition = definition;
+              console.log(definition);
+              return JSON.parse(definition);
+            })
+            .then(definition => this.renderSwaggerUI(definition));
+        },
+        async generateSpec(apikey, story) {
+          var myHeaders = new Headers();
+          myHeaders.append("Authorization", "Bearer " + apikey);
+          myHeaders.append("Content-Type", "application/json");
+
+          let prompt = "Create an OpenAPI definition as JSON for the following use case: " + story;
+
+          var raw = JSON.stringify({
+            "prompt": prompt,
+            "max_tokens": 2048
+          });
+
+          var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+          };
+
+          console.log("Sending request to OpenAI for the use case -> " + prompt);
+
+          return fetch("https://api.openai.com/v1/engines/text-davinci-003/completions", requestOptions)
+        },
+        renderSwaggerUI(definition) {
+          var swaggerUIOptions = {
+            spec: definition,
+            dom_id: '#swagger', // Determine what element to load swagger ui
+            docExpansion: 'list',
+            deepLinking: true, // Enables dynamic deep linking for tags and operations
+            filter: true,
+            presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIBundle.SwaggerUIStandalonePreset
+            ],
+            plugins: [
+              SwaggerUIBundle.plugins.DownloadUrl
+            ],
+          }
+
+          var ui = SwaggerUIBundle(swaggerUIOptions)
+
+          /** Export to window for use in custom js */
+          window.ui = ui
+          this.showSwaggerui = true;
+          this.showDefinition = true;
+          this.showLoading = false;
+        },
+        processResponseText(text) {
+          //remove text before the JSON start. OpenAI sometimes adds special characters or text
+          return text.substring(text.indexOf("{"));
+        }
+      }
+    }).mount('#app')
+  </script>
+
+</body>
+
+</html>
