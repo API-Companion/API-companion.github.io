@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="https://drive.google.com/uc?id=1BbT6qT9ycPEO8UR37bWOXWRqieqLJ5FQ&export=download&format=png">
     <title>API Companion</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
         integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -28,8 +29,8 @@
 
         <div class="row">
             <div class="col-md-6">
-                <div class="row-md"> <textarea class="form-control" rows=10 v-model="story" placeholder="Your User Story f.e.
-As a librarian i want to retrieve the list of books in the library" :disabled="showLoading"></textarea></div>
+                <div class="row-md"> <textarea class="form-control" rows=10 v-model="story" placeholder="Your User Stories f.e.
+1. As a librarian i want to retrieve the list of books in the library" :disabled="showLoading"></textarea></div>
                 <div class="row-md" style="margin-top:10px"><a class="btn btn-light" v-show="!showLoading" href="#"
                         v-on:click="submit">SUBMIT</a>
                     <div class="row-md">
@@ -38,6 +39,9 @@ As a librarian i want to retrieve the list of books in the library" :disabled="s
                         </div>
                     </div>
                 </div>
+                <div class="row-md" style="margin-top:10px"><div class="alert alert-primary" role="alert">
+                    Tip! The more you write, the better the outcome will be.
+                  </div></div>
             </div>
             <div class="col-md-6">
                 <div class="row-md" v-show="showError">
