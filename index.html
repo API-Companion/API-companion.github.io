@@ -21,6 +21,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.css"
         integrity="sha512-3ZF6q2IwJ/o3zbm5kBJX1RtjPFxnFcTBH+pa/jtnvvhygsYFcEqX+T9guR01rI8gozi4fPU95W+SZES6ew28qA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@3.23.1/swagger-ui-bundle.js"></script>
 </head>
 
 <body>
@@ -70,10 +72,6 @@
             </div>
         </div>
     </div>
-
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://unpkg.com/swagger-ui-dist@3.23.1/swagger-ui-bundle.js"></script>
-
     <script>
 
         const { createApp } = Vue;
@@ -94,9 +92,8 @@
                 submit() {
                     console.log("submitting " + this.story);
                     this.showLoading = true;
+                    this.showError=false;
                     this.submitsCount++;
-
-                    gtag('event', 'api_user_story', {"count": this.submitsCount, "story": this.story });
 
                     this.generateSpec(atob(this.apikey), this.story)
                         .then(response => response.json())
@@ -109,6 +106,7 @@
                         .then(definition => this.renderSwaggerUI(definition))
                         .catch(error => {
                             console.log("error: ", error);
+                            gtag('event', 'api_error', {"count": this.submitsCount, "story": this.story , "definition": this.definition, "error": error});
                             this.showError = true;
                             this.showLoading = false;
                         });
@@ -137,6 +135,7 @@
                     return fetch("https://api.openai.com/v1/engines/text-davinci-003/completions", requestOptions)
                 },
                 renderSwaggerUI(definition) {
+                    gtag('event', 'api_success', {"count": this.submitsCount, "story": this.story, "definition": this.definition});
                     var swaggerUIOptions = {
                         spec: definition,
                         dom_id: '#swagger', // Determine what element to load swagger ui
