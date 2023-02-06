@@ -2,6 +2,16 @@
 <html lang="en">
 
 <head>
+     <!-- Google tag (gtag.js) -->
+     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SPBPE3ECL6"></script>
+     <script>
+         window.dataLayer = window.dataLayer || [];
+         function gtag() { dataLayer.push(arguments); }
+         gtag('js', new Date());
+ 
+         gtag('config', 'G-SPBPE3ECL6');
+     </script>
+ 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/x-icon" href="https://drive.google.com/uc?id=1BbT6qT9ycPEO8UR37bWOXWRqieqLJ5FQ&export=download&format=png">
@@ -76,13 +86,17 @@
                     definition: "",
                     showLoading: false,
                     showResults: false,
-                    showError: false
+                    showError: false,
+                    submitsCount: 0
                 }
             },
             methods: {
                 submit() {
                     console.log("submitting " + this.story);
                     this.showLoading = true;
+                    this.submitsCount++;
+
+                    gtag('event', 'api_user_story', {"count": this.submitsCount, "story": this.story });
 
                     this.generateSpec(atob(this.apikey), this.story)
                         .then(response => response.json())
@@ -159,16 +173,6 @@
             }
         }).mount('#app')
     </script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SPBPE3ECL6"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', 'G-SPBPE3ECL6');
-    </script>
-
 </body>
 
 </html>
