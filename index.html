@@ -41,9 +41,9 @@
 
         <div class="row">
             <div class="col-md-6">
-                <div class="row-md"> <textarea class="form-control" rows=10 v-model="story" placeholder="Your User Stories f.e.
+                <div class="row-md"> <textarea id="story" class="form-control" rows=10 v-model="story" placeholder="Your User Stories f.e.
 1. As a librarian i want to retrieve the list of books in the library" :disabled="showLoading"></textarea></div>
-                <div class="row-md" style="margin-top:10px"><a class="btn btn-light" v-show="!showLoading" href="#"
+                <div class="row-md" style="margin-top:10px"><a id="submit" class="btn btn-light" v-show="!showLoading" href="#"
                         v-on:click="submit">SUBMIT</a>
                     <div class="row-md">
                         <div id="loading" v-show="showLoading" class="spinner-border text-primary" role="status">
@@ -56,17 +56,17 @@
                   </div></div>
             </div>
             <div class="col-md-6">
-                <div class="row-md" v-show="showError">
+                <div class="row-md" v-if="showError">
                     <div class="alert alert-danger" role="alert">
                         An unexpected error occured!
                     </div>
                 </div>
-                <div class="row-md" v-show="showResults">
+                <div class="row-md" v-if="showResults">
                     <h5 class="text-primary">Swagger UI</h5>
                     <div class="swagger border border-light rounded" id="swagger"></div>
                 </div>
-                <div class="row-md" v-show="showResults">
-                    <h5 class="text-primary">OpenAPI Definition</h5><textarea class="form-control" rows=40
+                <div class="row-md" v-if="showResults">
+                    <h5 class="text-primary">OpenAPI Definition</h5><textarea id="definition" class="form-control" rows=40
                         v-model="definition"></textarea>
                 </div>
             </div>
@@ -153,10 +153,8 @@
                         ],
                     }
 
-                    var ui = SwaggerUIBundle(swaggerUIOptions)
-
                     /** Export to window for use in custom js */
-                    window.ui = ui
+                    window.ui = SwaggerUIBundle(swaggerUIOptions)
                     this.showResults = true;
                     this.showLoading = false;
                 },
@@ -165,7 +163,7 @@
                     let firstBracketIndex = text.indexOf("{");
                     let lastBracketIndex = text.lastIndexOf("}");
 
-                    if (lastBracketIndex != text.length) {
+                    if (lastBracketIndex !== text.length) {
                         return text.slice(firstBracketIndex, lastBracketIndex + 1);
                     } else {
                         return text.substring(firstBracketIndex);
