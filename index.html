@@ -97,10 +97,12 @@
 
                     this.generateSpec(atob(this.apikey), this.story)
                         .then(response => response.json())
-                        .then(result => this.processResponseText(result.choices[0].text))
+                        .then(result => {
+                            console.log(result.choices[0].text); 
+                            return this.processResponseText(result.choices[0].text);
+                        })
                         .then(definition => {
                             this.definition = definition;
-                            console.log(definition);
                             return JSON.parse(definition);
                         })
                         .then(definition => this.renderSwaggerUI(definition))
